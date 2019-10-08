@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QStyle, QFileDialog, QStatusBar
 from PyQt5.QtGui import QIcon, QPalette, QColor
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer, QMediaPlaylist
 from player_ui import Ui_MainWindow
-
+import web_music
 
 def time_converter(mcs):
     return ("%02d:%02d" % divmod(mcs // 1000, 60))
@@ -14,7 +14,7 @@ def time_converter(mcs):
 
 def upload_data(path, instance):
     '''create dict from files in dir(path):
-    { 'filename': instance('filename')}'''
+    { 'filename': instance('filepath')}'''
     data = {}
 
     for item in os.listdir(path):
@@ -25,14 +25,22 @@ def upload_data(path, instance):
 
 
 class PlaylistModel(QAbstractListModel):
-    def __init__(self, playlist, *args, **kwargs):
+    def __init__(self, playlist, names, *args, **kwargs):
         super(PlaylistModel, self).__init__(*args, **kwargs)
         self.playlist = playlist
+        self.names = names
 
     def data(self, index, role):
         if role == Qt.DisplayRole:
-            media = self.playlist.media(index.row())
-            return media.canonicalUrl().fileName()
+            i = index.row()
+            if self.names and i < len(self.names):
+                return self.names[i]
+
+            else:
+                media = self.playlist.media(i)
+                return media.canonicalUrl().fileName()
+
+
 
     def rowCount(self, index):
         return self.playlist.mediaCount()
@@ -44,13 +52,14 @@ class Window(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.setWindowFlags(Qt.FramelessWindowHint)
-        self.mousePressEvent = lambda event: setattr(self, 'oldPos', event.globalPos())
 
+        self.oldPos = self.pos()
+        self.mousePressEvent = lambda event: setattr(self, 'oldPos', event.globalPos())
         self.icons = upload_data("data/icons", QIcon)
 
         #window buttons
         self.ui.minimizeButton.setIcon(self.icons['minimize'])
-        self.ui.minimizeButton.released.connect(self.showMinimized)
+        self.ui.minimizeButton.released.connect(lambda: (self.showMinimized(), setattr(self, 'oldPos', self.pos())))
 
         self.ui.maximizeButton.setIcon(self.icons['maximize'])
         self.ui.maximizeButton.released.connect(self.resizing)
@@ -84,6 +93,8 @@ class Window(QtWidgets.QMainWindow):
         self.ui.shuffleButton.toggled.connect(self.mode_control)
         self.ui.repeatButton.toggled.connect(self.mode_control)
         self.ui.volumeButton.pressed.connect(self.mute_control)
+        self.ui.searchButton.pressed.connect(self.search_music)
+        self.ui.clearListButton.pressed.connect(self.clear_playlist)
 
         #sliders
         self.ui.volumeSlider.valueChanged.connect(self.volume_control)
@@ -93,7 +104,8 @@ class Window(QtWidgets.QMainWindow):
         self.ui.timeSlider.sliderReleased.connect(self.time_slider_release)
 
         #model
-        self.model = PlaylistModel(self.playlist)
+        self.playlist_names = []
+        self.model = PlaylistModel(self.playlist, self.playlist_names)
         self.ui.playlistView.setModel(self.model)
 
         selection_model = self.ui.playlistView.selectionModel()
@@ -105,11 +117,14 @@ class Window(QtWidgets.QMainWindow):
         self.ui.nextButton.setIcon(self.icons['next'])
         self.ui.repeatButton.setIcon(self.icons['repeat'])
         self.ui.shuffleButton.setIcon(self.icons['shuffle'])
-        self.ui.volumeButton.setIcon(self.icons['medium-volume'])
+        self.ui.searchButton.setIcon(self.icons['search'])
+        self.ui.clearListButton.setIcon(self.icons['clear-list'])
 
         #some settings
         self.activate(False)
         self.setAcceptDrops(True)
+        self.ui.volumeSlider.setValue(25)
+        self.mode_control()
 
     def activate(self, state):
         state = not state
@@ -119,6 +134,33 @@ class Window(QtWidgets.QMainWindow):
         self.ui.repeatButton.setDisabled(state)
         self.ui.shuffleButton.setDisabled(state)
         self.ui.timeSlider.setDisabled(state)
+
+
+    def clear_playlist(self):
+        self.playlist.clear()
+        self.playlist_names.clear()
+        self.model.layoutChanged.emit()
+        self.activate(False)
+
+    def update_playlist(self):
+        self.model.layoutChanged.emit()
+        self.activate(bool(self.playlist.mediaCount()))
+
+    def search_music(self):
+        query = self.ui.searchInput.text()
+        if not query:
+            return
+
+        self.ui.searchButton.setDisabled(True)
+        self.clear_playlist()
+
+        for item in web_music.search(query):
+            self.playlist_names.append(f"{item['author']} - {item['title']}")
+            self.playlist.addMedia(QMediaContent(QUrl(item['url'])))
+
+        self.update_playlist()
+        self.ui.searchButton.setDisabled(False)
+        self.player.play()
 
     def dragEnterEvent(self, e):
         if e.mimeData().hasUrls():
@@ -134,9 +176,7 @@ class Window(QtWidgets.QMainWindow):
             else:
                 self.playlist.addMedia(QMediaContent(url))
 
-        self.model.layoutChanged.emit()
-        if self.playlist.mediaCount():
-            self.activate(True)
+        self.update_playlist()
 
     def update_duration(self, duration):
         self.ui.timeSlider.setMaximum(duration)
@@ -209,13 +249,18 @@ class Window(QtWidgets.QMainWindow):
     def playlist_position_changed(self, i):
         if i > -1:
             ix = self.model.index(i)
-            name = self.playlist.media(ix.row()).canonicalUrl().fileName()
             self.ui.playlistView.setCurrentIndex(ix)
-            self.ui.mediaName.setText(os.path.splitext(name)[0])
+            if self.model.names and i < len(self.model.names):
+                self.ui.mediaName.setText(self.model.names[i])
+            else:
+                name = self.playlist.media(ix.row()).canonicalUrl().fileName()
+                self.ui.mediaName.setText(os.path.splitext(name)[0])
 
     def mouseMoveEvent(self, event):
-        delta = QPoint (event.globalPos() - self.oldPos)
-        self.move(self.x() + delta.x(), self.y() + delta.y())
+        if not self.isMaximized():
+            delta = QPoint(event.globalPos() - self.oldPos)
+            self.move(self.x() + delta.x(), self.y() + delta.y())
+
         self.oldPos = event.globalPos()
 
     def resizing(self):
