@@ -216,6 +216,52 @@
       </property>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QPushButton" name="clearListButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>100</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="mouseTracking">
+           <bool>true</bool>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clear playlist&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">*{
+	background-color: rgba(53, 53, 53, 0);
+	border: none;
+}
+*:hover{
+	background-color: rgb(76,76,76);
+}</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="flat">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
         <item>
          <spacer name="horizontalSpacer_7">
           <property name="orientation">
@@ -248,7 +294,7 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>32</width>
-              <height>20</height>
+              <height>24</height>
              </size>
             </property>
            </spacer>
@@ -315,6 +361,9 @@
             <property name="mouseTracking">
              <bool>true</bool>
             </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="styleSheet">
              <string notr="true">*:hover{
 	background-color: rgb(76,76,76);
@@ -346,6 +395,40 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QPushButton" name="downloadButton">
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="contextMenuPolicy">
+           <enum>Qt::CustomContextMenu</enum>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Download selected tracks&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">*{
+	background-color: rgba(53, 53, 53, 0);
+	border: none;
+}
+*:hover{
+	background-color: rgb(76,76,76);
+}</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
@@ -371,6 +454,9 @@
         <property name="autoScrollMargin">
          <number>16</number>
         </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::DoubleClicked</set>
+        </property>
         <property name="dragEnabled">
          <bool>false</bool>
         </property>
@@ -384,7 +470,7 @@
          <enum>Qt::CopyAction</enum>
         </property>
         <property name="selectionMode">
-         <enum>QAbstractItemView::SingleSelection</enum>
+         <enum>QAbstractItemView::ExtendedSelection</enum>
         </property>
         <property name="iconSize">
          <size>
@@ -399,6 +485,9 @@
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
          <widget class="QLabel" name="mediaName">
           <property name="minimumSize">
@@ -415,37 +504,6 @@
           </property>
           <property name="text">
            <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="clearListButton">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>32</width>
-            <height>24</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>32</width>
-            <height>24</height>
-           </size>
-          </property>
-          <property name="mouseTracking">
-           <bool>true</bool>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="flat">
-           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -488,7 +546,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <property name="spacing">
-         <number>10</number>
+         <number>6</number>
         </property>
         <item>
          <spacer name="horizontalSpacer_2">
@@ -524,6 +582,9 @@
             </property>
             <property name="mouseTracking">
              <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="styleSheet">
              <string notr="true">*{
@@ -564,6 +625,13 @@
             </property>
             <property name="mouseTracking">
              <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Play&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="styleSheet">
              <string notr="true">*{
@@ -613,6 +681,9 @@
             </property>
             <property name="mouseTracking">
              <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="styleSheet">
              <string notr="true">*{
@@ -677,8 +748,20 @@
             <property name="mouseTracking">
              <bool>true</bool>
             </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Repeat current&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="styleSheet">
-             <string notr="true"/>
+             <string notr="true">*{
+	background-color: rgba(53, 53, 53, 0);
+	border: none;
+}
+*:hover{
+	background-color: rgb(76,76,76);
+}
+*:checked{
+	border: 2px solid rgb(100,100,100) ;
+}</string>
             </property>
             <property name="text">
              <string/>
@@ -696,7 +779,7 @@
              <bool>false</bool>
             </property>
             <property name="flat">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -717,9 +800,22 @@
             <property name="mouseTracking">
              <bool>true</bool>
             </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shuffle&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
             <property name="styleSheet">
-             <string notr="true">*:hover{
-	background-color: rgba(76,76,76,255);
+             <string notr="true">*{
+	background-color: rgba(53, 53, 53, 0);
+	border: none;
+}
+*:hover{
+	background-color: rgb(76,76,76);
+}
+*:checked{
+	border: 2px solid rgb(100,100,100) ;
 }</string>
             </property>
             <property name="text">
@@ -738,7 +834,7 @@
              <bool>false</bool>
             </property>
             <property name="flat">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -778,6 +874,9 @@
             </property>
             <property name="mouseTracking">
              <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="styleSheet">
              <string notr="true">*{
@@ -889,6 +988,11 @@
     <bool>true</bool>
    </property>
   </widget>
+  <action name="actiondownload_folder">
+   <property name="text">
+    <string>download folder</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>playButton</tabstop>
@@ -899,7 +1003,6 @@
   <tabstop>repeatButton</tabstop>
   <tabstop>shuffleButton</tabstop>
   <tabstop>volumeButton</tabstop>
-  <tabstop>clearListButton</tabstop>
   <tabstop>minimizeButton</tabstop>
   <tabstop>maximizeButton</tabstop>
   <tabstop>volumeSlider</tabstop>

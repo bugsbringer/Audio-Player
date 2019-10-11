@@ -6,7 +6,9 @@ from PyQt5.QtWidgets import QStyle, QFileDialog, QStatusBar
 from PyQt5.QtGui import QIcon, QPalette, QColor
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer, QMediaPlaylist
 from player_ui import Ui_MainWindow
-import web_music
+from threading import Thread
+import web_music, downloader
+import json
 
 def time_converter(mcs):
     return ("%02d:%02d" % divmod(mcs // 1000, 60))
@@ -57,7 +59,7 @@ class Window(QtWidgets.QMainWindow):
         self.mousePressEvent = lambda event: setattr(self, 'oldPos', event.globalPos())
         self.icons = upload_data("data/icons", QIcon)
 
-        #window buttons
+        # window buttons
         self.ui.minimizeButton.setIcon(self.icons['minimize'])
         self.ui.minimizeButton.released.connect(lambda: (self.showMinimized(), setattr(self, 'oldPos', self.pos())))
 
@@ -67,7 +69,7 @@ class Window(QtWidgets.QMainWindow):
         self.ui.closeButton.setIcon(self.icons['close'])
         self.ui.closeButton.released.connect(self.close)
 
-        #playlist
+        # playlist
         self.playlist = QMediaPlaylist()
         self.playlist_modes = {
             "normal": QMediaPlaylist.Loop,
@@ -77,7 +79,7 @@ class Window(QtWidgets.QMainWindow):
         self.playlist.currentIndexChanged.connect(self.playlist_position_changed)
         self.playlist.loadFailed.connect(lambda error: print(error))
 
-        #player
+        # player
         self.player = QMediaPlayer()
         self.player.error.connect(lambda *args: print(args))
         self.player.setPlaylist(self.playlist)
@@ -86,7 +88,7 @@ class Window(QtWidgets.QMainWindow):
         self.player.positionChanged.connect(self.update_position)
         self.player.mediaStatusChanged.connect(self.media_control)
 
-        #buttons
+        # buttons
         self.ui.playButton.pressed.connect(self.play_control)
         self.ui.prevButton.pressed.connect(self.playlist.previous)
         self.ui.nextButton.pressed.connect(self.playlist.next)
@@ -95,23 +97,25 @@ class Window(QtWidgets.QMainWindow):
         self.ui.volumeButton.pressed.connect(self.mute_control)
         self.ui.searchButton.pressed.connect(self.search_music)
         self.ui.clearListButton.pressed.connect(self.clear_playlist)
+        self.ui.downloadButton.pressed.connect(self.download_music)
+        self.ui.downloadButton.customContextMenuRequested.connect(self.download_menu)
 
-        #sliders
+        # sliders
         self.ui.volumeSlider.valueChanged.connect(self.volume_control)
         self.timeSliderPressed = False
         self.ui.timeSlider.sliderPressed.connect(lambda: setattr(self, 'timeSliderPressed', True))
         self.ui.timeSlider.sliderMoved.connect(lambda pos: self.ui.currentTime.setText(time_converter(pos)))
         self.ui.timeSlider.sliderReleased.connect(self.time_slider_release)
 
-        #model
+        # model
         self.playlist_names = []
         self.model = PlaylistModel(self.playlist, self.playlist_names)
         self.ui.playlistView.setModel(self.model)
 
         selection_model = self.ui.playlistView.selectionModel()
-        selection_model.selectionChanged.connect(self.playlist_selection_changed)
+        self.ui.playlistView.doubleClicked.connect(self.playlist_doubleclick)
 
-        #icons
+        # icons
         self.ui.prevButton.setIcon(self.icons['prev'])
         self.ui.playButton.setIcon(self.icons['play'])
         self.ui.nextButton.setIcon(self.icons['next'])
@@ -119,12 +123,21 @@ class Window(QtWidgets.QMainWindow):
         self.ui.shuffleButton.setIcon(self.icons['shuffle'])
         self.ui.searchButton.setIcon(self.icons['search'])
         self.ui.clearListButton.setIcon(self.icons['clear-list'])
+        self.ui.downloadButton.setIcon(self.icons['download'])
 
-        #some settings
+        # actions
+        self.change_dfolder_action = QtWidgets.QAction('Сhange folder', self)
+        self.change_dfolder_action.triggered.connect(self.change_download_folder)
+
+        # some settings
         self.activate(False)
         self.setAcceptDrops(True)
-        self.ui.volumeSlider.setValue(25)
         self.mode_control()
+        with open("data/settings.json", 'r', encoding='utf-8') as file:
+            self.settings = json.load(file)
+
+        self.ui.volumeSlider.setValue(self.settings.setdefault("volume", 25))
+        self.download_path = self.settings.setdefault("download-path", ".")
 
     def activate(self, state):
         state = not state
@@ -135,6 +148,41 @@ class Window(QtWidgets.QMainWindow):
         self.ui.shuffleButton.setDisabled(state)
         self.ui.timeSlider.setDisabled(state)
 
+    def download_menu(self, pos):
+        menu = QtWidgets.QMenu()
+        menu.addAction(self.change_dfolder_action)
+        menu.exec_(self.sender().mapToGlobal(pos))
+
+    def change_download_folder(self):
+        path = QFileDialog.getExistingDirectory(self, 'Выбор папки')
+        if path:
+            self.download_path = path
+            self.settings['download-path'] = path
+            with open("data/settings.json", 'w', encoding='utf-8') as file:
+                json.dump(self.settings, file)
+
+    def download_music(self):
+        if not self.model.names:
+            return
+
+        indexses = self.ui.playlistView.selectedIndexes()
+        download_info = []
+        for i in indexses:
+            i = i.row()
+            if i >= len(self.model.names):
+                break
+            d = {}
+            d['url'] = str(self.playlist.media(i).canonicalUrl().url())
+            d['title'] = self.model.names[i]
+            download_info.append(d)
+
+        if download_info:
+            Thread(target=self.downloading, args=(download_info,)).start()
+
+    def downloading(self, info):
+        self.ui.statusBar.showMessage(f'Downloading {len(info)} file(s)')
+        downloader.start(info, self.download_path)
+        self.ui.statusBar.showMessage(f'Download complete')
 
     def clear_playlist(self):
         self.playlist.clear()
@@ -223,6 +271,9 @@ class Window(QtWidgets.QMainWindow):
                 self.ui.volumeButton.setIcon(self.icons['medium-volume'])
             else:
                 self.ui.volumeButton.setIcon(self.icons['high-volume'])
+            self.settings['volume'] = volume
+            with open("data/settings.json", 'w', encoding='utf-8') as file:
+                json.dump(self.settings, file)
         else:
             if self.ui.volumeSlider.underMouse():
                 self.prevVolumeValue = 50
@@ -241,20 +292,20 @@ class Window(QtWidgets.QMainWindow):
         self.timeSliderPressed = False
         self.player.setPosition(self.ui.timeSlider.value())
 
-    def playlist_selection_changed(self, index):
-        i = index.indexes()[0].row()
-        self.playlist.setCurrentIndex(i)
+    def playlist_doubleclick(self, index):
+        self.playlist.setCurrentIndex(index.row())
         self.player.play()
 
     def playlist_position_changed(self, i):
-        if i > -1:
-            ix = self.model.index(i)
-            self.ui.playlistView.setCurrentIndex(ix)
-            if self.model.names and i < len(self.model.names):
-                self.ui.mediaName.setText(self.model.names[i])
-            else:
-                name = self.playlist.media(ix.row()).canonicalUrl().fileName()
-                self.ui.mediaName.setText(os.path.splitext(name)[0])
+        ix = self.model.index(i)
+        self.ui.playlistView.setCurrentIndex(ix)
+
+        if self.model.names and i < len(self.model.names):
+            self.ui.mediaName.setText(self.model.names[i])
+
+        else:
+            name = self.playlist.media(ix.row()).canonicalUrl().fileName()
+            self.ui.mediaName.setText(os.path.splitext(name)[0])
 
     def mouseMoveEvent(self, event):
         if not self.isMaximized():

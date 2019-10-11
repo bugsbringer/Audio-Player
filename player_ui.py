@@ -97,13 +97,34 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.setContentsMargins(5, 5, 5, -1)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_6.setSpacing(0)
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
+        self.clearListButton = QtWidgets.QPushButton(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.clearListButton.sizePolicy().hasHeightForWidth())
+        self.clearListButton.setSizePolicy(sizePolicy)
+        self.clearListButton.setMinimumSize(QtCore.QSize(32, 24))
+        self.clearListButton.setMaximumSize(QtCore.QSize(100, 24))
+        self.clearListButton.setMouseTracking(True)
+        self.clearListButton.setStyleSheet("*{\n"
+"    background-color: rgba(53, 53, 53, 0);\n"
+"    border: none;\n"
+"}\n"
+"*:hover{\n"
+"    background-color: rgb(76,76,76);\n"
+"}")
+        self.clearListButton.setText("")
+        self.clearListButton.setFlat(False)
+        self.clearListButton.setObjectName("clearListButton")
+        self.horizontalLayout_6.addWidget(self.clearListButton)
         spacerItem1 = QtWidgets.QSpacerItem(60, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_6.addItem(spacerItem1)
         self.horizontalLayout_8 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_8.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.horizontalLayout_8.setObjectName("horizontalLayout_8")
-        spacerItem2 = QtWidgets.QSpacerItem(32, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        spacerItem2 = QtWidgets.QSpacerItem(32, 24, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_8.addItem(spacerItem2)
         self.searchInput = QtWidgets.QLineEdit(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
@@ -143,6 +164,20 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addLayout(self.horizontalLayout_8)
         spacerItem3 = QtWidgets.QSpacerItem(60, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_6.addItem(spacerItem3)
+        self.downloadButton = QtWidgets.QPushButton(self.centralwidget)
+        self.downloadButton.setMinimumSize(QtCore.QSize(32, 24))
+        self.downloadButton.setMaximumSize(QtCore.QSize(32, 24))
+        self.downloadButton.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.downloadButton.setStyleSheet("*{\n"
+"    background-color: rgba(53, 53, 53, 0);\n"
+"    border: none;\n"
+"}\n"
+"*:hover{\n"
+"    background-color: rgb(76,76,76);\n"
+"}")
+        self.downloadButton.setText("")
+        self.downloadButton.setObjectName("downloadButton")
+        self.horizontalLayout_6.addWidget(self.downloadButton)
         self.verticalLayout_3.addLayout(self.horizontalLayout_6)
         self.playlistView = QtWidgets.QListView(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
@@ -155,16 +190,18 @@ class Ui_MainWindow(object):
         self.playlistView.setFrameShadow(QtWidgets.QFrame.Plain)
         self.playlistView.setLineWidth(0)
         self.playlistView.setAutoScrollMargin(16)
+        self.playlistView.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked)
         self.playlistView.setDragEnabled(False)
         self.playlistView.setDragDropOverwriteMode(False)
         self.playlistView.setDragDropMode(QtWidgets.QAbstractItemView.NoDragDrop)
         self.playlistView.setDefaultDropAction(QtCore.Qt.CopyAction)
-        self.playlistView.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.playlistView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.playlistView.setIconSize(QtCore.QSize(16, 16))
         self.playlistView.setViewMode(QtWidgets.QListView.ListMode)
         self.playlistView.setObjectName("playlistView")
         self.verticalLayout_3.addWidget(self.playlistView)
         self.horizontalLayout_9 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_9.setSpacing(0)
         self.horizontalLayout_9.setObjectName("horizontalLayout_9")
         self.mediaName = QtWidgets.QLabel(self.centralwidget)
         self.mediaName.setMinimumSize(QtCore.QSize(0, 20))
@@ -175,19 +212,6 @@ class Ui_MainWindow(object):
         self.mediaName.setText("")
         self.mediaName.setObjectName("mediaName")
         self.horizontalLayout_9.addWidget(self.mediaName)
-        self.clearListButton = QtWidgets.QPushButton(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.clearListButton.sizePolicy().hasHeightForWidth())
-        self.clearListButton.setSizePolicy(sizePolicy)
-        self.clearListButton.setMinimumSize(QtCore.QSize(32, 24))
-        self.clearListButton.setMaximumSize(QtCore.QSize(32, 24))
-        self.clearListButton.setMouseTracking(True)
-        self.clearListButton.setText("")
-        self.clearListButton.setFlat(True)
-        self.clearListButton.setObjectName("clearListButton")
-        self.horizontalLayout_9.addWidget(self.clearListButton)
         self.verticalLayout_3.addLayout(self.horizontalLayout_9)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
@@ -206,7 +230,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addWidget(self.totalTime)
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_3.setSpacing(10)
+        self.horizontalLayout_3.setSpacing(6)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         spacerItem4 = QtWidgets.QSpacerItem(13, 26, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_3.addItem(spacerItem4)
@@ -291,12 +315,21 @@ class Ui_MainWindow(object):
         self.repeatButton.setSizePolicy(sizePolicy)
         self.repeatButton.setMinimumSize(QtCore.QSize(32, 0))
         self.repeatButton.setMouseTracking(True)
-        self.repeatButton.setStyleSheet("")
+        self.repeatButton.setStyleSheet("*{\n"
+"    background-color: rgba(53, 53, 53, 0);\n"
+"    border: none;\n"
+"}\n"
+"*:hover{\n"
+"    background-color: rgb(76,76,76);\n"
+"}\n"
+"*:checked{\n"
+"    border: 2px solid rgb(100,100,100) ;\n"
+"}")
         self.repeatButton.setText("")
         self.repeatButton.setIconSize(QtCore.QSize(16, 16))
         self.repeatButton.setCheckable(True)
         self.repeatButton.setChecked(False)
-        self.repeatButton.setFlat(True)
+        self.repeatButton.setFlat(False)
         self.repeatButton.setObjectName("repeatButton")
         self.horizontalLayout_4.addWidget(self.repeatButton)
         self.shuffleButton = QtWidgets.QPushButton(self.centralwidget)
@@ -307,14 +340,22 @@ class Ui_MainWindow(object):
         self.shuffleButton.setSizePolicy(sizePolicy)
         self.shuffleButton.setMinimumSize(QtCore.QSize(32, 0))
         self.shuffleButton.setMouseTracking(True)
-        self.shuffleButton.setStyleSheet("*:hover{\n"
-"    background-color: rgba(76,76,76,255);\n"
+        self.shuffleButton.setAutoFillBackground(False)
+        self.shuffleButton.setStyleSheet("*{\n"
+"    background-color: rgba(53, 53, 53, 0);\n"
+"    border: none;\n"
+"}\n"
+"*:hover{\n"
+"    background-color: rgb(76,76,76);\n"
+"}\n"
+"*:checked{\n"
+"    border: 2px solid rgb(100,100,100) ;\n"
 "}")
         self.shuffleButton.setText("")
         self.shuffleButton.setIconSize(QtCore.QSize(16, 16))
         self.shuffleButton.setCheckable(True)
         self.shuffleButton.setChecked(False)
-        self.shuffleButton.setFlat(True)
+        self.shuffleButton.setFlat(False)
         self.shuffleButton.setObjectName("shuffleButton")
         self.horizontalLayout_4.addWidget(self.shuffleButton)
         self.horizontalLayout_3.addLayout(self.horizontalLayout_4)
@@ -381,6 +422,8 @@ class Ui_MainWindow(object):
         self.statusBar.setSizeGripEnabled(True)
         self.statusBar.setObjectName("statusBar")
         MainWindow.setStatusBar(self.statusBar)
+        self.actiondownload_folder = QtWidgets.QAction(MainWindow)
+        self.actiondownload_folder.setObjectName("actiondownload_folder")
 
         self.retranslateUi(MainWindow)
         self.searchInput.returnPressed.connect(self.searchButton.click)
@@ -392,8 +435,7 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.nextButton, self.repeatButton)
         MainWindow.setTabOrder(self.repeatButton, self.shuffleButton)
         MainWindow.setTabOrder(self.shuffleButton, self.volumeButton)
-        MainWindow.setTabOrder(self.volumeButton, self.clearListButton)
-        MainWindow.setTabOrder(self.clearListButton, self.minimizeButton)
+        MainWindow.setTabOrder(self.volumeButton, self.minimizeButton)
         MainWindow.setTabOrder(self.minimizeButton, self.maximizeButton)
         MainWindow.setTabOrder(self.maximizeButton, self.volumeSlider)
         MainWindow.setTabOrder(self.volumeSlider, self.closeButton)
@@ -402,7 +444,21 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MediaPlayer"))
+        self.clearListButton.setToolTip(_translate("MainWindow", "<html><head/><body><p>Clear playlist</p></body></html>"))
         self.searchInput.setPlaceholderText(_translate("MainWindow", "Search music online"))
+        self.searchButton.setToolTip(_translate("MainWindow", "<html><head/><body><p>Search</p></body></html>"))
+        self.downloadButton.setToolTip(_translate("MainWindow", "<html><head/><body><p>Download selected tracks</p></body></html>"))
         self.currentTime.setText(_translate("MainWindow", "0:00"))
         self.totalTime.setText(_translate("MainWindow", "0:00"))
+        self.prevButton.setToolTip(_translate("MainWindow", "<html><head/><body><p>Previous</p></body></html>"))
+        self.playButton.setToolTip(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Play</p></body></html>"))
+        self.nextButton.setToolTip(_translate("MainWindow", "<html><head/><body><p>Next</p></body></html>"))
+        self.repeatButton.setToolTip(_translate("MainWindow", "<html><head/><body><p>Repeat current</p></body></html>"))
+        self.shuffleButton.setToolTip(_translate("MainWindow", "<html><head/><body><p>Shuffle</p></body></html>"))
+        self.volumeButton.setToolTip(_translate("MainWindow", "<html><head/><body><p>Mute</p></body></html>"))
+        self.actiondownload_folder.setText(_translate("MainWindow", "download folder"))
 
