@@ -5,6 +5,15 @@ import os
 
 
 def save(filepath, data):
+    # remove bad path characters from file name
+    *path, file = filepath.split('/')
+
+    bad_pat = r'<>:"/\|?*'
+    for item in bad_pat:
+        file = file.replace(item, '')
+
+    filepath = '/'.join([*path, file])
+
     # protects files from rewriting
     if os.path.exists(f"{filepath}.mp3"):
         i = 1
